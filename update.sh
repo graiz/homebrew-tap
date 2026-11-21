@@ -1,7 +1,7 @@
 #!/bin/sh
 # Point the formula at a release of kb: ./update.sh 0.2.0
 #
-# Puts the version, and each archive's checksum from that release's .sha256
+# Puts the version in each archive's URL, and each archive's checksum from that release's .sha256
 # files, in Formula/kittybrowser.rb. Commit and push the result.
 set -eu
 
@@ -10,7 +10,7 @@ version="${version#v}"
 formula="Formula/kittybrowser.rb"
 base="https://github.com/graiz/kittybrowser/releases/download/v$version"
 
-sed -i.bak "s/^  version \".*\"/  version \"$version\"/" "$formula"
+sed -i.bak "s|/releases/download/v[^/]*/|/releases/download/v$version/|" "$formula"
 for target in aarch64-apple-darwin x86_64-apple-darwin aarch64-unknown-linux-gnu x86_64-unknown-linux-gnu; do
   sum="$(curl -fsSL "$base/kb-$target.tar.gz.sha256" | cut -d ' ' -f 1)" ||
     { echo "update.sh: no checksum for $target in v$version; has the release finished building?" >&2; exit 1; }
